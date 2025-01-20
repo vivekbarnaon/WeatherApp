@@ -60,6 +60,7 @@
         Your browser does not support the video tag.
     </video>
 
+    <!-- Weather App Container -->
     <div class="container">
         <h2>Weather App</h2>
         <input type="text" id="location" placeholder="Enter location">
@@ -69,12 +70,20 @@
 
     <script>
         function getWeather() {
-            let location = document.getElementById('location').value;
-            let apiKey = 'f8182ff354694376838183847252001';
-            let url = `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+            const location = document.getElementById('location').value.trim();
+            const apiKey = 'f8182ff354694376838183847252001';
+            const url = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${location}&aqi=yes`;
+
+            // Clear previous results
+            document.getElementById('result').innerHTML = '<p>Loading...</p>';
 
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     document.getElementById('result').innerHTML = `
                         <h3>${data.location.name}, ${data.location.country}</h3>
@@ -84,7 +93,9 @@
                     `;
                 })
                 .catch(error => {
-                    document.getElementById('result').innerHTML = '<p style="color:red;">Invalid location or API issue</p>';
+                    console.error('Error fetching weather data:', error);
+                    document.getElementById('result').innerHTML = 
+                        '<p style="color:red;">Invalid location or API issue</p>';
                 });
         }
     </script>
